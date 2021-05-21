@@ -1,8 +1,7 @@
-#include <unistd.h>
-#include <stdio.h>
+#include "philosophers.h"
 
 int main(int argc, char const *argv[])
 {
-    
-    return 0;
+	
+	return 0;
 }
