@@ -12,5 +12,7 @@ typedef struct	s_philo1
 	int			time_to_sleep;
 	int			nbr_of_meals;
 }				t_philo1;
-	
+int				ft_isdigit(int c);
+int				ft_atoi(const char *str);
+
 #endif
