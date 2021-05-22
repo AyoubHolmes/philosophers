@@ -4,6 +4,8 @@ int	is_a_number(const char *s)
 {
 	if (s)
 	{
+		if (*s == '-')
+			s++;
 		while(*s)
 		{
 			if (!ft_isdigit(*s))
@@ -23,19 +25,40 @@ void s_philo1_printer(t_philo1 *philo1)
 	printf("nbr of meals: %d\n", philo1->nbr_of_meals);
 }
 
+int		get_postive_int(const char *s, int i, int *p)
+{
+	int	nbr;
+
+	nbr = -1;
+	if (*p == 1)
+	{
+		nbr = ft_atoi(s);
+		if (nbr < 0)
+		{
+			printf("\033[1;31mthe argument %d is a negative value!\033[0m\n", i);
+			*p = 0;
+			return (-1);
+		}
+	}
+	return (nbr);
+}
+
 void	ft_parsing(t_philo1 *philo1, int argc, char const *argv[])
 {
+	int	p;
+
+	p = 1;
 	printf("all argument are ready to be parsed.\n");
-	philo1->nbr_philos = ft_atoi(argv[1]);
-	philo1->time_to_die = ft_atoi(argv[2]);
-	philo1->time_to_eat = ft_atoi(argv[3]);
-	philo1->time_to_sleep = ft_atoi(argv[4]);
+	philo1->nbr_philos = get_postive_int(argv[1], 1, &p);
+	philo1->time_to_die = get_postive_int(argv[2], 2, &p);
+	philo1->time_to_eat = get_postive_int(argv[3], 3, &p);
+	philo1->time_to_sleep = get_postive_int(argv[4], 4, &p);
 	philo1->nbr_of_meals = -1;
 	if (argc == 6)
-		philo1->nbr_of_meals = ft_atoi(argv[5]);
-	s_philo1_printer(philo1);
-	// 😎 controller starts 😎
-	
+		philo1->nbr_of_meals = get_postive_int(argv[6], 6, &p);
+	if (p)
+		s_philo1_printer(philo1);
+	// 😎 controller starts here 😎	
 }
 
 int main(int argc, char const *argv[])
