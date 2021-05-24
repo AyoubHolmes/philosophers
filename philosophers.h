@@ -1,12 +1,12 @@
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
 
-# include <unistd.h>
-# include <stdio.h>
-# include <string.h>
-# include <stdlib.h>
-# include <pthread.h>
-# include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <sys/time.h>
 
 
 typedef struct	s_philo1
@@ -17,8 +17,18 @@ typedef struct	s_philo1
 	int			time_to_sleep;
 	int			nbr_of_meals;
 }				t_philo1;
+
+typedef struct			s_philos
+{
+	int				    s;
+	pthread_mutex_t		*lock;
+    struct timeval      tp;
+    int		            boolean;
+}						t_philos;
+
 int				ft_isdigit(int c);
 int				ft_atoi(const char *str);
+int 			ft_controller(t_philo1 *philos);
 
 /*
 

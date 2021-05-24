@@ -1,7 +1,8 @@
 NAME = philosophers
 CC = gcc
 
-SRC = ./philo1.c
+SRC = ./philo1.c \
+	./generating_philos.c
 
 SRCb = 
 

@@ -58,15 +58,22 @@ void	ft_parsing(t_philo1 *philo1, int argc, char const *argv[])
 	if (argc == 6)
 		philo1->nbr_of_meals = get_postive_int(argv[5], 5, &p);
 	if (p)
+	{
 		s_philo1_printer(philo1);
+		ft_controller(philo1);
+	}
 	// 😎 controller starts here 😎	
 }
 
 int main(int argc, char const *argv[])
 {
-	int i;
-	t_philo1 philo1;
+	int				i;
+	t_philo1		philo1;
+	struct timeval	tp;
+	int				init;
 
+	gettimeofday(&tp, NULL);
+	init = ((tp.tv_usec / 1000) + (tp.tv_sec * 1000));
 	if (argc == 5 || argc == 6)
 	{
 		i = 1;
@@ -84,5 +91,7 @@ int main(int argc, char const *argv[])
 	} 
 	else
 		printf("\033[1;31mnumber of parameters is wrong!\033[0m\n");
+	gettimeofday(&tp, NULL);
+	printf("Time per miliseconds: %ld\n", ((tp.tv_usec / 1000) + (tp.tv_sec * 1000)) - init);
 	return 0;
 }
