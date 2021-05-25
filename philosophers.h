@@ -12,24 +12,29 @@
 typedef struct	s_philo1
 {
 	int			nbr_philos;
+	int			nbr_forks;
 	int			time_to_die;
 	int			time_to_eat;
 	int			time_to_sleep;
 	int			nbr_of_meals;
+	long		init;
 }				t_philo1;
+
+t_philo1		philo1;
 
 typedef struct			s_philos
 {
 	int				    s;
 	pthread_mutex_t		*lock;
+	pthread_mutex_t		*forks;
     struct timeval      tp;
-    int		            boolean;
+	long				init;
 }						t_philos;
 
 int				ft_isdigit(int c);
 int				ft_atoi(const char *str);
 int 			ft_controller(t_philo1 *philos);
-
+long			ft_timer(long init);
 /*
 
 **	usleep: sleep per microseconds
