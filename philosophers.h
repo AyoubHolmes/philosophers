@@ -12,7 +12,6 @@
 typedef struct	s_philo1
 {
 	int			nbr_philos;
-	int			nbr_forks;
 	int			time_to_die;
 	int			time_to_eat;
 	int			time_to_sleep;
@@ -30,6 +29,7 @@ typedef struct			s_philos
     struct timeval      tp;
 	long				init;
 }						t_philos;
+pthread_mutex_t g_m;
 
 int				ft_isdigit(int c);
 int				ft_atoi(const char *str);

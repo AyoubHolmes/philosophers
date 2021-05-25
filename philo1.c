@@ -51,7 +51,6 @@ void	ft_parsing(t_philo1 *philo1, int argc, char const *argv[])
 	p = 1;
 	printf("\033[0;32mall argument are ready to be parsed.\033[0m\n");
 	philo1->nbr_philos = get_postive_int(argv[1], 1, &p);
-	philo1->nbr_forks = philo1->nbr_philos;
 	philo1->time_to_die = get_postive_int(argv[2], 2, &p);
 	philo1->time_to_eat = get_postive_int(argv[3], 3, &p);
 	philo1->time_to_sleep = get_postive_int(argv[4], 4, &p);
@@ -84,6 +83,8 @@ int main(int argc, char const *argv[])
 	gettimeofday(&tp, NULL);
 	philo1.init = ((tp.tv_usec / 1000) + (tp.tv_sec * 1000));
 	printf("****** TIMER: %ld ***********\n\n", philo1.init);
+	pthread_mutex_init(&g_m, NULL);
+	pthread_mutex_lock(&g_m);
 	if (argc == 5 || argc == 6)
 	{
 		i = 1;
@@ -103,5 +104,7 @@ int main(int argc, char const *argv[])
 		printf("\033[1;31mnumber of parameters is wrong!\033[0m\n");
 	stamp = ft_timer(philo1.init);
 	printf("Time per miliseconds: %ld\n", stamp);
+	pthread_mutex_lock(&g_m);
 	return 0;
-}
+} 
+ 
