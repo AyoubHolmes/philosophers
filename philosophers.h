@@ -17,6 +17,7 @@ typedef struct	s_philo1
 	int			time_to_sleep;
 	int			nbr_of_meals;
 	long		init;
+	pthread_mutex_t *msg;
 }				t_philo1;
 
 t_philo1		philo1;
@@ -24,7 +25,6 @@ t_philo1		philo1;
 typedef struct			s_philos
 {
 	int				    s;
-	pthread_mutex_t		*lock;
 	pthread_mutex_t		*forks;
     struct timeval      tp;
 	long				init;

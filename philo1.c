@@ -93,6 +93,7 @@ int main(int argc, char const *argv[])
 			if (!is_a_number(argv[i]))
 			{
 				printf("\033[1;31mthe argument %d is not a number!\033[0m\n", i);
+				pthread_mutex_unlock(&g_m);
 				break ;
 			}
 			i++;
@@ -101,10 +102,13 @@ int main(int argc, char const *argv[])
 			ft_parsing(&philo1, argc, argv);
 	} 
 	else
+	{
 		printf("\033[1;31mnumber of parameters is wrong!\033[0m\n");
-	stamp = ft_timer(philo1.init);
-	printf("Time per miliseconds: %ld\n", stamp);
-	pthread_mutex_lock(&g_m);
-	return 0;
+		pthread_mutex_unlock(&g_m);
+		i = -1;
+	}
+	if (i != -1)
+		pthread_mutex_lock(&g_m);
+	return (0);
 } 
  
