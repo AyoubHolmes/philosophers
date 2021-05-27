@@ -11,58 +11,69 @@ t_philos	*get_philo(int id, long init, pthread_mutex_t *forks)
 	return (ph);
 }
 
-void	philo_printer(char *s, long arg1, int arg2)
+void	philo_printer(char *s, long arg1, int arg2, int sleep)
 {
 	pthread_mutex_t msg;
 
 	pthread_mutex_init(&msg, NULL);
 	pthread_mutex_lock(&msg);
-	printf("%ld\t%d has taken a fork\n", arg1, arg2);
+	printf("%ld\t%d %s", arg1, arg2, s);
+	usleep(sleep * 1000);
 	pthread_mutex_unlock(&msg);
 }
 
 void	philo_lifecycle(t_philos *s)
 {
-	long after_eating;
 	pthread_mutex_t msg;
 	pthread_mutex_t died;
 
 	pthread_mutex_init(&msg, NULL);
 	pthread_mutex_lock(&(s)->forks[(s)->s]);
-	pthread_mutex_lock(&msg);
-	printf("%ld\t%d has taken a fork\n", ft_timer(s->init), (s)->s);
-	 pthread_mutex_unlock(&msg);
+	philo_printer("has taken a fork\n", ft_timer(s->init), (s)->s, 0);
 	pthread_mutex_lock(&(s)->forks[((s)->s + 1) % philo1.nbr_philos]);
-	 pthread_mutex_lock(&msg);
-	printf("%ld\t%d has taken a fork\n", ft_timer(s->init),(s)->s);
-	 pthread_mutex_unlock(&msg);
-	 pthread_mutex_lock(&msg);
-	printf("%ld\t%d is eating\n",ft_timer(s->init), (s)->s);
-	 pthread_mutex_unlock(&msg);
-	usleep(philo1.time_to_eat);
+	philo_printer("has taken a fork\n", ft_timer(s->init), (s)->s, 0);
+	philo_printer("is eating\n", ft_timer(s->init), (s)->s, philo1.time_to_eat);
 	pthread_mutex_unlock(&(s)->forks[((s)->s + 1) % philo1.nbr_philos]);
+	s->after_eating = ft_timer(0);
 	pthread_mutex_unlock(&(s)->forks[(s)->s]);
-	after_eating = ft_timer(0);
-	 pthread_mutex_lock(&msg);
-	printf("%ld\t%d is sleeping\n",ft_timer(s->init), (s)->s);
-	 pthread_mutex_unlock(&msg);
-	usleep(philo1.time_to_sleep);
-	 pthread_mutex_lock(&msg);
-	printf("%ld\t%d is thinking\n",ft_timer(s->init), (s)->s);
-	 pthread_mutex_unlock(&msg);
-	if (ft_timer(after_eating) > philo1.time_to_die)
+	philo_printer("is sleeping\n", ft_timer(s->init), (s)->s, philo1.time_to_sleep);
+	philo_printer("is thinking\n", ft_timer(s->init), (s)->s, 0);
+/* 	if (ft_timer(((t_philos *)s)->after_eating) > philo1.time_to_die)
 	{
 		pthread_mutex_lock(&msg);
-		printf("%ld\t%d died **** %ld ****\n",ft_timer(after_eating), (s)->s, ft_timer(after_eating));
+		printf("%ld\t%d died\n",ft_timer(((t_philos *)s)->init), ((t_philos *)s)->s);
 		pthread_mutex_unlock(&g_m);
+	} */
+}
+
+void	*ft_death_philo(void *s)
+{
+	pthread_mutex_t msg;
+
+	pthread_mutex_init(&msg, NULL);
+	while (1)
+	{
+		if (ft_timer(((t_philos *)s)->after_eating) > philo1.time_to_die)
+		{
+			pthread_mutex_lock(&msg);
+			printf("%ld\t%d died\n",ft_timer(((t_philos *)s)->init), ((t_philos *)s)->s);
+			pthread_mutex_unlock(&g_m);
+			return (NULL);
+		}
 	}
-	//  protect printf with mutex
+	return (NULL);
 }
 
 void	*ft_philosopher(void *s)
 {
+	pthread_t		soul_reaper;
+	t_philos		*p;
+
+	p = (t_philos *)s;
+	pthread_create(&soul_reaper, NULL, ft_death_philo, p);
+	pthread_detach(soul_reaper);
 	while (1)
-		philo_lifecycle((t_philos *)s);
+		philo_lifecycle(p);
 	return (NULL);
 }
 
@@ -84,7 +95,7 @@ int	ft_controller(t_philo1 *philos)
 		i++;
 	}
 	thread_ids = (pthread_t *)malloc(sizeof(pthread_t) * philos->nbr_philos);
-	printf("***************** {THE SIMULATION IS ON: %d} *****************\n", philo1.nbr_philos);
+	printf("****** {THE SIMULATION IS ON: %d} ******\n", philo1.nbr_philos);
 	i = 0;
 	while (i < philos->nbr_philos)
 	{
