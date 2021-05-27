@@ -16,14 +16,14 @@ int	is_a_number(const char *s)
 	return (1);
 }
 
-void s_philo1_printer(t_philo1 *philo1)
+void s_philo1_printer(t_philo_parse *parse)
 {
-	printf("nbr of philos: %d\n", philo1->nbr_philos);
-	printf("time to die: %d\n", philo1->time_to_die);
-	printf("time to eat: %d\n", philo1->time_to_eat);
-	printf("time to sleep: %d\n", philo1->time_to_sleep);
-	if (philo1->nbr_of_meals != -1)
-		printf("nbr of meals: %d\n", philo1->nbr_of_meals);
+	printf("nbr of philos: %d\n", parse->nbr_philos);
+	printf("time to die: %d\n", parse->time_to_die);
+	printf("time to eat: %d\n", parse->time_to_eat);
+	printf("time to sleep: %d\n", parse->time_to_sleep);
+	if (parse->nbr_of_meals != -1)
+		printf("nbr of meals: %d\n", parse->nbr_of_meals);
 }
 
 int		get_postive_int(const char *s, int i, int *p)
@@ -44,30 +44,29 @@ int		get_postive_int(const char *s, int i, int *p)
 	return (nbr);
 }
 
-void	ft_parsing(t_philo1 *philo1, int argc, char const *argv[])
+void	ft_parsing(t_philo_parse *parse, int argc, char const *argv[])
 {
 	int	p;
 
 	p = 1;
 	printf("\033[0;32mall argument are ready to be parsed.\033[0m\n");
-	philo1->nbr_philos = get_postive_int(argv[1], 1, &p);
-	philo1->time_to_die = get_postive_int(argv[2], 2, &p);
-	philo1->time_to_eat = get_postive_int(argv[3], 3, &p);
-	philo1->time_to_sleep = get_postive_int(argv[4], 4, &p);
-	philo1->nbr_of_meals = -1;
+	parse->nbr_philos = get_postive_int(argv[1], 1, &p);
+	parse->time_to_die = get_postive_int(argv[2], 2, &p);
+	parse->time_to_eat = get_postive_int(argv[3], 3, &p);
+	parse->time_to_sleep = get_postive_int(argv[4], 4, &p);
+	parse->nbr_of_meals = -1;
 	if (argc == 6)
-		philo1->nbr_of_meals = get_postive_int(argv[5], 5, &p);
+		parse->nbr_of_meals = get_postive_int(argv[5], 5, &p);
 	if (p)
 	{
-		s_philo1_printer(philo1);
-		ft_controller(philo1);
+		s_philo1_printer(parse);
+		ft_controller(parse);
 	}
 	// 😎 controller starts here 😎	
 }
 
 long	ft_timer(long init)
 {
-	long			timestamp_in_ms;
 	struct timeval	tp;
 
 	gettimeofday(&tp, NULL);	
@@ -81,34 +80,31 @@ int main(int argc, char const *argv[])
 	long			stamp;
 
 	gettimeofday(&tp, NULL);
-	philo1.init = ((tp.tv_usec / 1000) + (tp.tv_sec * 1000));
-	printf("****** TIMER: %ld ***********\n\n", philo1.init);
-	pthread_mutex_init(&g_m, NULL);
-	pthread_mutex_lock(&g_m);
+	parse.init = ((tp.tv_usec / 1000) + (tp.tv_sec * 1000));
+	printf("****** TIMER: %ld ***********\n\n", parse.init);
+	g_m = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(g_m, NULL);
+	pthread_mutex_lock(g_m);
 	if (argc == 5 || argc == 6)
 	{
-		i = 1;
-		while (i < argc)
-		{
+		i = 0;
+		while (++i < argc)
 			if (!is_a_number(argv[i]))
 			{
 				printf("\033[1;31mthe argument %d is not a number!\033[0m\n", i);
-				pthread_mutex_unlock(&g_m);
-				break ;
+				pthread_mutex_unlock(g_m);
+				return (1);
 			}
-			i++;
-		}
 		if (i == argc)
-			ft_parsing(&philo1, argc, argv);
+			ft_parsing(&parse, argc, argv);
 	} 
 	else
 	{
 		printf("\033[1;31mnumber of parameters is wrong!\033[0m\n");
-		pthread_mutex_unlock(&g_m);
-		i = -1;
+		pthread_mutex_unlock(g_m);
+		return (1);
 	}
-	if (i != -1)
-		pthread_mutex_lock(&g_m);
+	pthread_mutex_lock(g_m);
 	return (0);
 } 
  
