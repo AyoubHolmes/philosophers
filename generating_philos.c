@@ -40,12 +40,6 @@ void	philo_lifecycle(t_philos *s)
 
 	philo_printer("is sleeping\n", ft_timer(s->init), (s)->s, parse.time_to_sleep);
 	philo_printer("is thinking\n", ft_timer(s->init), (s)->s, 0);
-	// if (ft_timer(((t_philos *)s)->after_eating) > parse.time_to_die)
-	// {
-	// 	pthread_mutex_lock(&msg);
-	// 	printf("%ld\t%d died\n",ft_timer(((t_philos *)s)->init), ((t_philos *)s)->s);
-	// 	pthread_mutex_unlock(&g_m);
-	// }
 }
 
 void	*ft_death_philo(void *s)
@@ -58,14 +52,13 @@ void	*ft_death_philo(void *s)
 		pthread_mutex_lock(&p->life);
 		if (ft_timer(0) > p->after_eating)
 		{
-			pthrea d_mutex_lock(&msg);
+			pthread_mutex_lock(&msg);
 			printf("%ld\t%d died\n",ft_timer(p->init), p->s);
-			// pthread_mutex_unlock(&p->life);
 			pthread_mutex_unlock(g_m);
 			return (NULL);
 		}
 		pthread_mutex_unlock(&p->life);
-		usleep(100);
+		usleep(1000);
 	}
 	return (NULL);
 }
@@ -109,9 +102,10 @@ int	ft_controller(t_philo_parse *philos)
 	i = 0;
 	while (i < philos->nbr_philos)
 	{
-		pthread_create(&thread_id, NULL, ft_philosopher, get_philo(i + 1, philos->init, forks));
+		pthread_create(&thread_id, NULL,
+			ft_philosopher, get_philo(i + 1, philos->init, forks));
 		pthread_detach(thread_id);
-		usleep(100);
+		usleep(1000);
 		i++;
 	}
 	i = 0;
