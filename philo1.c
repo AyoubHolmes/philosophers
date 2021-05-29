@@ -62,7 +62,6 @@ void	ft_parsing(t_philo_parse *parse, int argc, char const *argv[])
 		s_philo1_printer(parse);
 		ft_controller(parse);
 	}
-	// 😎 controller starts here 😎	
 }
 
 long	ft_timer(long init)
