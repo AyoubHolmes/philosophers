@@ -64,7 +64,10 @@ void	*ft_death_philo(void *s)
 		if (ft_timer(0) > p->after_eating)
 		{
 			pthread_mutex_lock(&msg);
-			printf("%ld\t%d died\n",ft_timer(p->init), p->s);
+			if (p->nbr_of_meals == -1)
+				printf("%ld\t%d died\n",ft_timer(p->init), p->s);
+			else
+				printf("\033[0;32mDONE\033[0m\n");
 			pthread_mutex_unlock(g_m);
 			return (NULL);
 		}
@@ -118,14 +121,8 @@ int	ft_controller(t_philo_parse *philos)
 	{
 		pthread_create(&thread_id, NULL,
 			ft_philosopher, get_philo(i + 1, philos->init, forks, philos));
-		pthread_detach(thread_id);
 		usleep(100);
-		i++;
-	}
-	i = 0;
-	while (i < philos->nbr_philos)
-	{
-		pthread_mutex_destroy(&forks[i]);
+		pthread_detach(thread_id);
 		i++;
 	}
 	return (0);
