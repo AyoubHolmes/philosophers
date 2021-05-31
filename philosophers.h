@@ -9,7 +9,7 @@
 #include <sys/time.h>
 
 
-typedef struct	s_philo_parse
+typedef struct		s_philo_parse
 {
 	int				nbr_philos;
 	int				time_to_die;
@@ -18,21 +18,18 @@ typedef struct	s_philo_parse
 	int				nbr_of_meals;
 	long			init;
 	pthread_mutex_t	*msg;
-}				t_philo_parse;
-
-t_philo_parse		parse;
-pthread_mutex_t		msg;
-pthread_mutex_t 	*g_m;
+	pthread_mutex_t *g_m;
+}					t_philo_parse;
 
 typedef struct			s_philos
 {
-	t_philo_parse		parse;
+	t_philo_parse		*parse;
 	int				    s;
 	pthread_mutex_t		*forks;
 	pthread_mutex_t		life;
     struct timeval      tp;
 	long				init;
-	long				after_eating;
+	long				time_counter;
 	struct timeval		t_limit;
 	int					nbr_of_meals;
 }						t_philos;

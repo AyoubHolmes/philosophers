@@ -28,6 +28,7 @@ bonus: $(OBJb)
 clean:
 	@make fclean -C $(LIBFT)
 	@rm -rf $(OBJ) $(OBJb)
+	@rm -rf debug_*
 
 fclean: clean
 	@rm -rf $(NAME)
