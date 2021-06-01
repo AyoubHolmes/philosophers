@@ -38,9 +38,15 @@ typedef struct			s_philos
 
 int				ft_isdigit(int c);
 int				ft_atoi(const char *str);
-int 			ft_controller(t_philo_parse *philos);
+void 			ft_controller(t_philo_parse *philos);
 long			ft_timer(long init);
 int				ft_atoi(const char *str);
 int				ft_isdigit(int c);
+int				is_a_number(const char *s);
+void			s_philo1_printer(t_philo_parse *parse);
+int				get_postive_int(const char *s, int i, int *p);
+t_philos		*get_philo(int id, pthread_mutex_t *forks, t_philo_parse *parse);
+void			philo_printer(char *s, t_philos *p, int sleep)
+;
 
 #endif
