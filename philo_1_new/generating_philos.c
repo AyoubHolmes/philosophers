@@ -28,16 +28,16 @@ void	philo_lifecycle(t_philos *s)
 {
 	struct timeval	tp;
 
-	pthread_mutex_lock(&s->life);
 	pthread_mutex_lock(&(s)->forks[(s)->s - 1]);
 	philo_printer("has taken a fork\n", s, 0);
 	pthread_mutex_lock(&(s)->forks[((s)->s) % s->parse->nbr_philos]);
 	philo_printer("has taken a fork\n", s, 0);
 	s->time_counter = ft_timer(0) + s->parse->time_to_die;
+	pthread_mutex_lock(&s->life);
 	philo_printer("is eating\n", s, s->parse->time_to_eat);
+	pthread_mutex_unlock(&s->life);
 	pthread_mutex_unlock(&(s)->forks[(s)->s - 1]);
 	pthread_mutex_unlock(&(s)->forks[((s)->s) % s->parse->nbr_philos]); 
-	pthread_mutex_unlock(&s->life);
 	philo_printer("is sleeping\n", s, s->parse->time_to_sleep);
 	philo_printer("is thinking\n", s, 0);
 }
