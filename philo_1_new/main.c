@@ -65,6 +65,7 @@ void	ft_parsing(t_philo_parse *parse, int argc, char const *argv[], pthread_mute
 		s_philo1_printer(parse);
 		parse->g_m = g_m;
 		parse->msg = msg;
+		parse->alive = 1;
 		ft_controller(parse);
 	}
 }
@@ -88,8 +89,6 @@ int main(int argc, char const *argv[])
 	gettimeofday(&tp, NULL);
 	parse.init = ((tp.tv_usec / 1000) + (tp.tv_sec * 1000));
 	printf("****** TIMER: %ld ***********\n\n", parse.init);
-	pthread_mutex_init(&g_m, NULL);
-	pthread_mutex_lock(&g_m);
 	if (argc == 5 || argc == 6)
 	{
 		i = 0;
@@ -97,7 +96,6 @@ int main(int argc, char const *argv[])
 			if (!is_a_number(argv[i]))
 			{
 				printf("\033[1;31mthe argument %d is not a number!\033[0m\n", i);
-				pthread_mutex_unlock(&g_m);
 				return (1);
 			}
 		if (i == argc)
@@ -106,10 +104,8 @@ int main(int argc, char const *argv[])
 	else
 	{
 		printf("\033[1;31mnumber of parameters is wrong!\033[0m\n");
-		pthread_mutex_unlock(&g_m);
 		return (1);
 	}
-	pthread_mutex_lock(&g_m);
 	return (0);
 } 
  

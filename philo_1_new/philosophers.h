@@ -17,6 +17,7 @@ typedef struct		s_philo_parse
 	int				time_to_sleep;
 	int				nbr_of_meals;
 	long			init;
+	int				alive;
 	pthread_mutex_t	*msg;
 	pthread_mutex_t *g_m;
 }					t_philo_parse;

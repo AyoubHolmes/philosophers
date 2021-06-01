@@ -16,11 +16,13 @@ t_philos	*get_philo(int id, long init, pthread_mutex_t *forks, t_philo_parse *pa
 
 void	philo_printer(char *s, t_philos *p, int sleep)
 {
-
-	pthread_mutex_lock(p->parse->msg);
-	printf("%ld\t%d %s", ft_timer(p->init), p->s, s);
-	pthread_mutex_unlock(p->parse->msg);
-	usleep(sleep * 1000);
+	if (p->parse->alive)
+	{
+		pthread_mutex_lock(p->parse->msg);
+		printf("%ld\t%d %s", ft_timer(p->init), p->s, s);
+		pthread_mutex_unlock(p->parse->msg);
+		usleep(sleep * 1000);
+	}
 }
 
 void	philo_lifecycle(t_philos *s)
@@ -50,11 +52,15 @@ void	*ft_death_philo(void *s)
 		if (ft_timer(0) > p->time_counter)
 		{
 			pthread_mutex_lock(p->parse->msg);
-			if (p->nbr_of_meals == -2)
-				printf("%ld\t%d died\n",ft_timer(p->init), p->s);
-			else
-				printf("\033[0;32mDONE\033[0m\n");
-			pthread_mutex_unlock(p->parse->g_m);
+			if (p->parse->alive == 1)
+			{	
+				if (p->nbr_of_meals == -2)
+					printf("%ld\t%d died\n",ft_timer(p->init), p->s);
+				else
+					printf("\033[0;32mDONE\033[0m\n");
+				p->parse->alive = 0;
+			}
+			pthread_mutex_unlock(p->parse->msg);
 			return (NULL);
 		}
 		pthread_mutex_unlock(&p->life);
@@ -72,14 +78,14 @@ void	*ft_philosopher(void *s)
 	p = (t_philos *)s;
 	p->time_counter = ft_timer(0) + (long) p->parse->time_to_die;
 	pthread_create(&soul_reaper, NULL, ft_death_philo, p);
-	pthread_detach(soul_reaper);
 	if (p->nbr_of_meals == -2)
 	{
-		while (1)
+		while (p->parse->alive)
 			philo_lifecycle(p);
 	}
 	while (p->nbr_of_meals-- > 0)
 		philo_lifecycle(p);
+	pthread_join(soul_reaper, NULL);
 	return (NULL);
 }
 
@@ -107,7 +113,18 @@ int	ft_controller(t_philo_parse *philos)
 		pthread_create(&thread_id, NULL,
 			ft_philosopher, get_philo(i + 1, philos->init, forks, philos));
 		usleep(100);
-		pthread_detach(thread_id);
+		i++;
+	}
+	i = 0;
+	while (i < philos->nbr_philos)
+	{
+		pthread_join(thread_id, NULL);
+		i++;
+	}
+	i = 0;
+	while (i < philos->nbr_philos)
+	{
+		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
 	return (0);
