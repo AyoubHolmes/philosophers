@@ -5,6 +5,7 @@ SRC = ./main.c \
 	./generating_philos.c \
 	./utils/ft_atoi.c \
 	./utils/ft_isdigit.c \
+	./philo_tools.c \
 
 SRCb = 
 

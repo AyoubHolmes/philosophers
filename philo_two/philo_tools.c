@@ -45,7 +45,7 @@ int		get_postive_int(const char *s, int i, int *p)
 }
 
 
-t_philos	*get_philo(int id, pthread_mutex_t *forks, t_philo_parse *parse)
+t_philos	*get_philo(int id, sem_t *forks, t_philo_parse *parse)
 {
 	t_philos *ph;
 
@@ -60,11 +60,11 @@ t_philos	*get_philo(int id, pthread_mutex_t *forks, t_philo_parse *parse)
 
 void	philo_printer(char *s, t_philos *p, int sleep)
 {
-	if (p->parse->alive && p->nbr_of_meals > 0)
+	if (p->parse->alive && (p->nbr_of_meals > 0 || p->nbr_of_meals == -2))
 	{
-		pthread_mutex_lock(p->parse->msg);
+		sem_wait(p->parse->msg);
 		printf("%ld\t%d %s", ft_timer(p->init), p->s, s);
-		pthread_mutex_unlock(p->parse->msg);
+		sem_post(p->parse->msg);
 		usleep(sleep * 1000);
 	}
 }

@@ -22,7 +22,7 @@ void s_philo1_printer(t_philo_parse *parse)
 	printf("time to die: %d\n", parse->time_to_die);
 	printf("time to eat: %d\n", parse->time_to_eat);
 	printf("time to sleep: %d\n", parse->time_to_sleep);
-	if (parse->nbr_of_meals != -1)
+	if (parse->nbr_of_meals != -2)
 		printf("nbr of meals: %d\n", parse->nbr_of_meals);
 }
 
