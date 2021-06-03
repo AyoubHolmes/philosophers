@@ -4,18 +4,18 @@ void	philo_lifecycle(t_philos *s)
 {
 	struct timeval	tp;
 
-	pthread_mutex_lock(&(s)->forks[(s)->s - 1]);
+	sem_wait(s->forks);
 	philo_printer("has taken a fork\n", s, 0);
-	pthread_mutex_lock(&(s)->forks[((s)->s) % s->parse->nbr_philos]);
+	sem_wait(s->forks);
 	philo_printer("has taken a fork\n", s, 0);
 	s->time_counter = ft_timer(0) + s->parse->time_to_die;
-	pthread_mutex_lock(&s->life);
+	sem_wait(s->life);
 	philo_printer("is eating\n", s, s->parse->time_to_eat);
 	if (s->nbr_of_meals >= 0)
 		s->nbr_of_meals--;
-	pthread_mutex_unlock(&s->life);
-	pthread_mutex_unlock(&(s)->forks[(s)->s - 1]);
-	pthread_mutex_unlock(&(s)->forks[((s)->s) % s->parse->nbr_philos]); 
+	sem_post(s->life);
+	sem_post(s->forks);
+	sem_post(s->forks);
 	philo_printer("is sleeping\n", s, s->parse->time_to_sleep);
 	philo_printer("is thinking\n", s, 0);
 }
@@ -28,10 +28,10 @@ void	*ft_death_philo(void *s)
 	while (p->parse->alive)
 	{
 		usleep(300);
-		pthread_mutex_lock(&p->life);
+		sem_wait(p->life);
 		if (ft_timer(0) > p->time_counter)
 		{
-			pthread_mutex_lock(p->parse->msg);
+			sem_wait(p->parse->msg);
 			if (p->parse->alive == 1)
 			{
 				if (p->nbr_of_meals == -2)
@@ -39,15 +39,17 @@ void	*ft_death_philo(void *s)
 				else
 					printf("\033[0;32mDONE\033[0m\n");
 				p->parse->alive = 0;
+				sem_post(p->parse->prog);
+				return (NULL);
 			}
-			pthread_mutex_unlock(p->parse->msg);
+			sem_post(p->parse->msg);
 		}
-		pthread_mutex_unlock(&p->life);
+		sem_post(p->life);
 	}
 	return (NULL);
 }
 
-void	*ft_philosopher(void *s)
+void	ft_philosopher(void *s)
 {
 	pthread_t		soul_reaper;
 	t_philos		*p;
@@ -55,7 +57,8 @@ void	*ft_philosopher(void *s)
 
 	p = (t_philos *)s;
 	p->time_counter = ft_timer(0) + (long) p->parse->time_to_die;
-	pthread_mutex_init(&p->life, NULL);
+	sem_unlink("/life");
+	p->life = sem_open("/life",  O_CREAT, 0600, 1);
 	pthread_create(&soul_reaper, NULL, ft_death_philo, p);
 	if (p->nbr_of_meals == -2)
 	{
@@ -65,54 +68,47 @@ void	*ft_philosopher(void *s)
 	while (p->nbr_of_meals > 0)
 		philo_lifecycle(p);
 	pthread_join(soul_reaper, NULL);
-	return (NULL);
+	exit(0);
 }
 
-void	ft_end(pthread_t *thread_ids, pthread_mutex_t *forks, t_philo_parse *philos)
+void	ft_end(pid_t *process_ids, t_philo_parse *philos)
 {
 	int	i;
 
 	i = 0;
 	while (i < philos->nbr_philos)
 	{
-		pthread_join(thread_ids[i], NULL);
+		kill(process_ids[i], SIGQUIT);
 		i++;
 	}
-	i = 0;
-	while (i < philos->nbr_philos)
-	{
-		pthread_mutex_destroy(&forks[i]);
-		i++;
-	}
-	free(thread_ids);
-	free(forks);
 }
 
 void	ft_controller(t_philo_parse *philos)
 {
-	pthread_mutex_t		*forks;
+	sem_t				*forks;
+	
 	t_philos			ph;
-	pthread_t			*thread_ids;
+	pid_t				*process_ids;
 	int					i;
+	pid_t				pid;
 
-	thread_ids = (pthread_t *)malloc(sizeof(pthread_t));
-	forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * philos->nbr_philos);
+	process_ids = (pid_t *)malloc(sizeof(pid_t));
 	i = 0;
-	while (i < philos->nbr_philos)
-	{
-		if (pthread_mutex_init(&forks[i], NULL) != 0) {
-			printf("\n mutex init has failed\n");
-		}
-		i++;
-	}
+	sem_unlink("/forks");
+	sem_unlink("/prog");
+
 	printf("****** {THE SIMULATION IS ON} ******\n");
+	forks = sem_open("/forks", O_CREAT, 0600, philos->nbr_philos);
+	philos->prog = sem_open("/prog", O_CREAT, 0600, 0);
 	i = 0;
 	while (i < philos->nbr_philos)
 	{
-		pthread_create(&thread_ids[i], NULL,
-			ft_philosopher, get_philo(i + 1, forks, philos));
-		usleep(1000);
+		if ((process_ids[i] = fork()) == 0)
+			ft_philosopher(get_philo(i + 1, forks, philos));
+		usleep(100);
 		i++;
 	}
-	ft_end(thread_ids, forks, philos);
+	sem_wait(philos->prog);
+	sem_post(philos->prog);
+	ft_end(process_ids, philos);
 }

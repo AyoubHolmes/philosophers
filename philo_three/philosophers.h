@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <semaphore.h>
+#include <signal.h>
 
 
 typedef struct		s_philo_parse
@@ -17,16 +19,17 @@ typedef struct		s_philo_parse
 	int				time_to_sleep;
 	int				nbr_of_meals;
 	long			init;
-	pthread_mutex_t	*msg;
-	pthread_mutex_t *g_m;
+	int				alive;
+	sem_t			*msg;
+	sem_t			*prog;
 }					t_philo_parse;
 
 typedef struct			s_philos
 {
 	t_philo_parse		*parse;
 	int				    s;
-	pthread_mutex_t		*forks;
-	pthread_mutex_t		life;
+	sem_t		*forks;
+	sem_t		*life;
     struct timeval      tp;
 	long				init;
 	long				time_counter;
@@ -34,12 +37,17 @@ typedef struct			s_philos
 	int					nbr_of_meals;
 }						t_philos;
 
-
 int				ft_isdigit(int c);
 int				ft_atoi(const char *str);
-int 			ft_controller(t_philo_parse *philos);
+void 			ft_controller(t_philo_parse *philos);
 long			ft_timer(long init);
 int				ft_atoi(const char *str);
 int				ft_isdigit(int c);
+int				is_a_number(const char *s);
+void			s_philo1_printer(t_philo_parse *parse);
+int				get_postive_int(const char *s, int i, int *p);
+t_philos		*get_philo(int id, sem_t *forks, t_philo_parse *parse);
+void			philo_printer(char *s, t_philos *p, int sleep);
+
 
 #endif

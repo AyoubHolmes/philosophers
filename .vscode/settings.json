@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "philosophers.h": "c",
-        "pthread.h": "c",
-        "semaphore.h": "c"
-    }
-}

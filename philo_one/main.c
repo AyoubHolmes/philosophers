@@ -39,12 +39,13 @@ int main(int argc, char const *argv[])
 	int				i;
 	struct timeval	tp;
 	long			stamp;
-	t_philo_parse	parse;
+	t_philo_parse	*parse;
 	pthread_mutex_t g_m;
+	
 
 	gettimeofday(&tp, NULL);
-	parse.init = ((tp.tv_usec / 1000) + (tp.tv_sec * 1000));
-	printf("****** TIMER: %ld ***********\n\n", parse.init);
+	parse = (t_philo_parse *)malloc(sizeof(t_philo_parse));
+	parse->init = ((tp.tv_usec / 1000) + (tp.tv_sec * 1000));
 	if (argc == 5 || argc == 6)
 	{
 		i = 0;
@@ -52,15 +53,16 @@ int main(int argc, char const *argv[])
 			if (!is_a_number(argv[i]))
 			{
 				printf("\033[1;31mthe argument %d is not a number!\033[0m\n", i);
+				free(parse);
 				return (1);
 			}
 		if (i == argc)
-			ft_parsing(&parse, argc, argv, &g_m);
+			ft_parsing(parse, argc, argv, &g_m);
 	} 
 	else
 	{
 		printf("\033[1;31mnumber of parameters is wrong!\033[0m\n");
-
+		free(parse);
 		return (1);
 	}
 	return (0);
